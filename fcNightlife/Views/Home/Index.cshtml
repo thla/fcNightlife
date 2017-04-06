@@ -1,11 +1,25 @@
-﻿@{
+﻿@model fcNightlife.Models.SearchModel
+
+@{
     ViewBag.Title = "Home Page";
 }
 
 <div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="http://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+    <h1>What's up today?</h1>
+    <p class="lead">Search for bars in your area, see if other people are going tonight, and RSVP!</p>
+
+    @using (Html.BeginForm("Results", "Home", FormMethod.Get, new { @class = "form-inline", @role = "form" }))
+    {
+        <div class="form-group">
+            <fieldset>
+
+                <span class="editor-field">
+                    @Html.TextBoxFor(m => m.Location, new { @required = true, @class = "form-control", @placeholder = @Html.DisplayNameFor(m => m.Location) })
+                </span>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </fieldset>
+        </div>
+    }
 </div>
 
 <div class="row">
