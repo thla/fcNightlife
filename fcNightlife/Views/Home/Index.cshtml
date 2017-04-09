@@ -3,24 +3,40 @@
 @{
     ViewBag.Title = "Home Page";
 }
+@section scripts
+{
+    <script type="text/javascript" src="~/Scripts/jquery-3.1.1.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+}
+
 
 <div class="jumbotron">
     <h1>What's up today?</h1>
     <p class="lead">Search for bars in your area, see if other people are going tonight, and RSVP!</p>
 
-    @using (Html.BeginForm("Results", "Home", FormMethod.Get, new { @class = "form-inline", @role = "form" }))
-    {
-        <div class="form-group">
-            <fieldset>
+    <div class="form-inline">
+        @using (@Ajax.BeginForm("ShowList", "Home",
+                        new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "resultdiv", InsertionMode = InsertionMode.Replace, LoadingElementId = "waitimage" }))
 
-                <span class="editor-field">
-                    @Html.TextBoxFor(m => m.Location, new { @required = true, @class = "form-control", @placeholder = @Html.DisplayNameFor(m => m.Location) })
-                </span>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </fieldset>
-        </div>
-    }
+        {
+            <div class="form-group">
+                <fieldset>
+
+                    <span class="editor-field">
+                        @Html.TextBoxFor(m => m.Location, new { @required = true, @class = "form-control", @placeholder = @Html.DisplayNameFor(m => m.Location) })
+                    </span>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <span id="waitimage" class="glyphicon glyphicon-refresh glyphicon-spin" style="display: none;"></span>
+                </fieldset>
+            </div>
+        }
+    </div>
 </div>
+
+
+<div id="resultdiv">
+
+</div>    
 
 <div class="row">
     <div class="col-md-4">
