@@ -21,20 +21,6 @@ namespace fcNightlife.Controllers
         {
             ViewBag.Message = "Free Codecamp nightlife coordination app.";
 
-            var yelp = new Yelp(YConfig.Options);
- 
-            try
-            {
-                var results = yelp.Search("coffee", "seattle, wa").Result;
-                return PartialView("_ShowList", results);
-
-            }
-            catch (Exception e)
-            {
-
-                throw;
-            }
-
             return View();
         }
 
@@ -57,17 +43,8 @@ namespace fcNightlife.Controllers
                         location = model.Location
                     }
                 };
-                try
-                {
-                    var results = yelp.Search("coffee", "seattle, wa").Result;
-                    return PartialView("_ShowList", results);
-
-                }
-                catch (Exception e)
-                {
-
-                    throw;
-                }
+                var results = yelp.Search(searchOptions).Result;
+                return PartialView("_ShowList", results);
             }
             return RedirectToAction("Index");
         }

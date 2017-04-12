@@ -1,5 +1,15 @@
 ﻿@model YelpSharp.Data.SearchResults
 
-
 <h2>Results</h2>
+<hr />
+<section>
+    <table id="bars">
+        <tbody>
+            @foreach (var b in @Model.businesses)
+            {
+                @Html.Partial("BusinessCard", b)
+            }
+        </tbody>
+    </table>
+</section>
 
