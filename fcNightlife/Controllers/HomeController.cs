@@ -1,7 +1,9 @@
 ﻿using fcNightlife.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using YelpSharp;
@@ -30,7 +32,8 @@ namespace fcNightlife.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        public ActionResult ShowList(SearchModel model)
+        [HttpPost]
+        public async Task<ActionResult> ShowList(SearchModel model)
         {
             if (ModelState.IsValid)
             {
@@ -43,13 +46,44 @@ namespace fcNightlife.Controllers
                         location = model.Location
                     }
                 };
-                var results = yelp.Search(searchOptions).Result;
-                return PartialView("_ShowList", results);
+                var search = await yelp.Search(searchOptions);
+                System.Web.HttpContext.Current.Session["Location"] = model.Location;
+                System.Web.HttpContext.Current.Session["SearchResults"] = search;
+
+                IDictionary<string, Location> going = new Dictionary<string, Location>();
+                if (search.total > 0)
+                {
+                    string city = search.businesses[0].location.city;
+                    using (var goingContext = new GoingContext())
+                    {
+                        try
+                        {
+                            going = goingContext.Locations.Where(x => x.City == city).ToDictionary(v => v.LocationID, v => v);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw;
+                        }
+                    }
+                }
+                return PartialView("_ShowList", Tuple.Create(going, search));
             }
             return RedirectToAction("Index");
         }
 
         #endregion
+
+        [HttpPost]
+        public JsonResult Going(string id)
+        {
+            int count = 10;
+            //PersonModel person = new PersonModel
+            //{
+            //    Name = name,
+            //    DateTime = DateTime.Now.ToString()
+            //};
+            return Json(count);
+        }
 
         public ActionResult Contact()
         {

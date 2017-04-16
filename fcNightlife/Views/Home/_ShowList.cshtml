@@ -1,15 +1,47 @@
-﻿@model YelpSharp.Data.SearchResults
+﻿@using fcNightlife.Models;
+@model Tuple<IDictionary<string, Location>, YelpSharp.Data.SearchResults> 
 
 <h2>Results</h2>
 <hr />
 <section>
     <table id="bars">
         <tbody>
-            @foreach (var b in @Model.businesses)
+            @if (@Model.Item2.businesses == null)
             {
-                @Html.Partial("BusinessCard", b)
+                <p>No locations found!</p>
             }
+            else
+	        {
+                foreach (var b in @Model.Item2.businesses)
+                {
+                    @Html.Partial("BusinessCard", Tuple.Create(@Model.Item1, b))
+                }	         
+	        }
         </tbody>
     </table>
 </section>
 
+<script src="/Scripts/jquery-3.1.1.js"></script>
+<script type="text/javascript">
+        $(function () {
+            $(".btnGoing").click(function () {
+                var selector = $(this).data('selector');              
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/Going",
+                    data: '{id: "' + selector + '" }',
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        alert("Hello counter is:  " + response.data.count);
+                    },
+                    failure: function (response) {
+                        alert(response.responseText);
+                    },
+                    error: function (response) {
+                        alert(response.responseText);
+                    }
+                });
+            });
+        });
+</script>

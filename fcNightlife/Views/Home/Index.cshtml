@@ -21,9 +21,8 @@
         {
             <div class="form-group">
                 <fieldset>
-
                     <span class="editor-field">
-                        @Html.TextBoxFor(m => m.Location, new { @required = true, @class = "form-control", @placeholder = @Html.DisplayNameFor(m => m.Location) })
+                        @Html.TextBoxFor(m => m.Location, new { @Value = @Session["Location"] != null ? @Session["Location"].ToString() : "", @required = true, @class = "form-control", @placeholder = @Html.DisplayNameFor(m => m.Location) })
                     </span>
                     <button type="submit" class="btn btn-primary">Submit</button>
                     <span id="waitimage" class="glyphicon glyphicon-refresh glyphicon-spin" style="display: none;"></span>
@@ -35,8 +34,12 @@
 
 
 <div id="resultdiv">
-
+    @if (@Session["SearchResults"] != null)
+    {
+        @Html.Partial("_ShowList", @Session["SearchResults"]);
+    }
 </div>    
+
 
 <div class="row">
     <div class="col-md-4">
@@ -59,3 +62,4 @@
         <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
     </div>
 </div>
+

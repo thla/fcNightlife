@@ -1,18 +1,33 @@
-﻿@model YelpSharp.Data.Business
+﻿@using fcNightlife.Models;
+@model Tuple<IDictionary<string, Location>, YelpSharp.Data.Business> 
 
 <tr>
-    <td class="col-xs-2 img-col"><div class="img-container"><a href="@Model.url" target="_blank"><img src="@Model.image_url" class="media-object" style="width:120px"></a></div></td>
+    <td class="col-xs-2 img-col"><div class="img-container"><a href="@Model.Item2.url" target="_blank"><img src="@Model.Item2.image_url" class="media-object" style="width:120px"></a></div></td>
     <td class="col-xs-8">
         <p class="lead">
 
-            <a href="@Model.url" target="_blank">
-                @Model.name
+            <a href="@Model.Item2.url" target="_blank">
+                @Model.Item2.name
             </a>
 
-        </p><p>@Model.location.display_address[0]</p><p>@Model.snippet_text</p>
+        </p><p>@Model.Item2.location.display_address[0]</p><p>@Model.Item2.snippet_text</p>
     </td>
     <td class="col-xs-2">
-        <input type="button" value="0 Going" class="btn btn-default" onclick="location.href='@Url.Action("Login", "Account")'" />
+        @{int going = 0; Location location;}        
+        @if (@Model.Item1.TryGetValue(@Model.Item2.id, out location))
+        {
+            going = location.Users == null ? 0 : location.Users.Count;
+        }
+
+        @if (@Request.IsAuthenticated)
+        {       
+            <input type="button" value="@going Going" data-selector="@Model.Item2.id" class="btn btn-default btnGoing"  />
+        }
+        else
+        {
+            <input type="button" value="@going Going" class="btn btn-default" onclick="location.href='@Url.Action("Login", "Account")'" />
+        }
     </td>
 </tr>
 <tr><td colspan="100%"><hr /></td></tr>
+
