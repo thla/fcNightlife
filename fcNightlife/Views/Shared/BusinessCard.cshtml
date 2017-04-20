@@ -13,10 +13,10 @@
         </p><p>@Model.Item2.location.display_address[0]</p><p>@Model.Item2.snippet_text</p>
     </td>
     <td class="col-xs-2">
-        @{int going = 0; Location location;}        
-        @if (@Model.Item1.TryGetValue(@Model.Item2.id, out location))
+        @{int going = 0;}      
+        @if (@Model.Item1.ContainsKey(@Model.Item2.id))
         {
-            going = location.Users == null ? 0 : location.Users.Count;
+            going = @Model.Item1[@Model.Item2.id].Users.Count;
         }
 
         @if (@Request.IsAuthenticated)

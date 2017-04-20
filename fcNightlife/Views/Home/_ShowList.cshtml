@@ -26,22 +26,23 @@
         $(function () {
             $(".btnGoing").click(function () {
                 var selector = $(this).data('selector');              
+                var button = $(this)["0"];
                 $.ajax({
-                    type: "POST",
                     url: "/Home/Going",
+                    type: 'POST',
                     data: '{id: "' + selector + '" }',
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    success: function (response) {
-                        alert("Hello counter is:  " + response.data.count);
+                    dataType: 'json',
+                    contentType: 'application/json; charset=utf-8',
+                    error: function (xhr) {
+                        alert('Error: ' + xhr.statusText);
                     },
-                    failure: function (response) {
-                        alert(response.responseText);
+                    success: function (result) {
+                        button.value = result.count + " Going";
                     },
-                    error: function (response) {
-                        alert(response.responseText);
-                    }
+                    async: true,
+                    processData: false
                 });
+
             });
         });
 </script>

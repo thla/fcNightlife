@@ -1,6 +1,7 @@
 ﻿using fcNightlife.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -48,17 +49,17 @@ namespace fcNightlife.Controllers
                 };
                 var search = await yelp.Search(searchOptions);
                 System.Web.HttpContext.Current.Session["Location"] = model.Location;
-                System.Web.HttpContext.Current.Session["SearchResults"] = search;
 
                 IDictionary<string, Location> going = new Dictionary<string, Location>();
                 if (search.total > 0)
                 {
                     string city = search.businesses[0].location.city;
+                    System.Web.HttpContext.Current.Session["City"] = city;
                     using (var goingContext = new GoingContext())
                     {
                         try
                         {
-                            going = goingContext.Locations.Where(x => x.City == city).ToDictionary(v => v.LocationID, v => v);
+                            going = goingContext.Locations.Include("Users").Where(x => x.City == city).ToDictionary(v => v.LocationID, v => v);
                         }
                         catch (Exception ex)
                         {
@@ -66,7 +67,9 @@ namespace fcNightlife.Controllers
                         }
                     }
                 }
-                return PartialView("_ShowList", Tuple.Create(going, search));
+                var tuple = Tuple.Create(going, search);
+                System.Web.HttpContext.Current.Session["SearchResults"] = tuple;
+                return PartialView("_ShowList", tuple);
             }
             return RedirectToAction("Index");
         }
@@ -74,15 +77,45 @@ namespace fcNightlife.Controllers
         #endregion
 
         [HttpPost]
-        public JsonResult Going(string id)
+        public ActionResult Going(string id)
         {
-            int count = 10;
-            //PersonModel person = new PersonModel
-            //{
-            //    Name = name,
-            //    DateTime = DateTime.Now.ToString()
-            //};
-            return Json(count);
+            if (User.Identity.IsAuthenticated)
+            {
+                using (var goingContext = new GoingContext())
+                {
+                    var location = goingContext.Locations.Find(id);
+                    if (location == null)
+                    {
+                        location = new Location();
+                        location.LocationID = id;
+                        location.City = System.Web.HttpContext.Current.Session["City"].ToString();
+                        goingContext.Locations.Add(location);
+                        goingContext.SaveChanges();
+
+                    }
+                    location = goingContext.Locations.Find(id);
+                    if (location.Users.FirstOrDefault(u => u.UserID == User.Identity.Name) == null)
+                    {
+                        // add
+                        User user = new User();
+                        user.UserID = User.Identity.Name;
+                        location.Users.Add(user);
+                    }
+                    else
+                    {
+                        //remove
+                        var user = location.Users.FirstOrDefault(x => x.UserID == User.Identity.Name);
+                        if (user != null)
+                        {
+                            location.Users.Remove(user);
+                        }
+
+                    }
+                    goingContext.SaveChanges();
+                    return Json(new { count = location.Users.Count}, JsonRequestBehavior.AllowGet);
+                }
+            }
+            return Json(new { count = 0 }, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult Contact()

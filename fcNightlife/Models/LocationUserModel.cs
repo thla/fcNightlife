@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
@@ -17,7 +18,6 @@ namespace fcNightlife.Models
         }
 
         public DbSet<Location> Locations { get; set; }
-        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -41,12 +41,12 @@ namespace fcNightlife.Models
 
     public class User
     {
-        public User()
-        {
-            Locations= new List<Location>();
-        }
         [Key]
+        [Column(Order = 1)]
         public string UserID { get; set; }
-        public virtual ICollection<Location> Locations{ get; set; }
+        [Key, ForeignKey("Location")]
+        [Column(Order = 2)]
+        public string LocationID { get; set; }
+        public virtual Location Location { get; set; }
     }
 }
