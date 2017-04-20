@@ -13,7 +13,7 @@ namespace fcNightlife.Models
     public class GoingContext : DbContext
     {
 
-        public GoingContext() : base("GoingContext")
+        public GoingContext() : base("DefaultConnection")
         {
         }
 
